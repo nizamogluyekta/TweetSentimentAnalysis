@@ -1,8 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
-import numpy
 import csv
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 
@@ -100,8 +101,25 @@ def analyzeTweet(TweetList):
 
 def writeTweetList(path, TweetList):
 
+    neg = 0
+    pos = 0
+    net = 0
+
     # All the valued data is stored again inside a csv file.
     with open(path, mode='w',  encoding="utf-8") as ValuedTweet_File:
         tweet_writer = csv.writer(ValuedTweet_File, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for tw in TweetList:
             tweet_writer.writerow([tw.user_name, tw.date, tw.text, tw.sentimentname, tw.sentimentvalue])
+            if tw.sentimentname == 'Positive':
+                pos += 1
+            elif tw.sentimentname == 'Neutral':
+                net += 1
+            else:
+                neg += 1
+    
+    chart = np.array([pos, net, neg])
+    mylabels = ["Positive", "Neutral", "Negative"]
+
+    plt.pie(chart, labels= mylabels, explode=(0, 0, 0.3), autopct='%1.1f%%')
+    plt.title("Total Tweets Covered = " + str(len(TweetList)))
+    plt.show()
